@@ -18,14 +18,25 @@ quit     - quits the program [INCOMPLETE]
 
 Deadline 20.10.
 more testing required still
-More info coming soon...
 
 TODO:
 
+
 ?    - refine the info for each command 
+
 add 
+
 mod
+
 sav   - no need to sav if no modifications done
+
 ld    - small refinements needed
+
 apply
+
 quit  - save file if modifications since last save
+
+upload the design documents
+
+
+More info coming soon...
