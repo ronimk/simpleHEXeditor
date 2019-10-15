@@ -1,7 +1,5 @@
 # simpleHEXeditor
-A small project for the fall break 2019
-
-
+A small project for the fall break 2019<br>
 Tested with MCUXpresso and CodeBlocks
 
 
