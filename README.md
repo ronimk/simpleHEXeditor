@@ -6,14 +6,10 @@ Tested with MCUXpresso and CodeBlocks
 <br>
 <br>
 List of available commands:
-
-
-?        - to show help [INCOMPLETE]
-
-show     - to show a block of bytes of an opened file in HEX format [COMPLETE]
-
-del      - to delete a block of bytes from the file [COMPLETE]
-
+<br>
+?        - to show help [INCOMPLETE]<br>
+show     - to show a block of bytes of an opened file in HEX format [COMPLETE]<br>
+del      - to delete a block of bytes from the file [COMPLETE]<br>
 add      - to add bytes into the open file [NOT STARTED]
 
 mod      - to modify a block of bytes in the file [NOT STARTED]
