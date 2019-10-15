@@ -1,8 +1,10 @@
 # simpleHEXeditor
-A small project for the fall break 2019<br>
+A small project for the fall break 2019
+<br>
+<br>
 Tested with MCUXpresso and CodeBlocks
-
-
+<br>
+<br>
 List of available commands:
 
 
