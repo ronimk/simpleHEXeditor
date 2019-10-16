@@ -15,7 +15,7 @@ add      - to add bytes into the open file [NOT STARTED]<br>
 mod      - to modify a block of bytes in the file [NOT STARTED]<br>
 filesize - to print the size of the open file [COMPLETE]<br>
 sav      - to save any changes made to the file [COMPLETE]<br>
-ld       - to open a desired file [INCOMPLETE]<br>
+ld       - to open a desired file [COMPLETE]<br>
 apply    - to apply a previous patch to the file [NOT STARTED]<br>
 quit     - quits the program [COMPLETE]
 <br>
@@ -31,7 +31,6 @@ TODO:
 ?    - refine the help info for each command<br>
 add<br>
 mod<br>
-ld    - small refinements needed<br>
 apply<br>
 upload the design documents<br>
 refactoring and finetuning
