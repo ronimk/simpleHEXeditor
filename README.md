@@ -8,7 +8,7 @@ Tested with MCUXpresso and CodeBlocks
 List of available commands:
 <br>
 <br>
-?        - to show help [INCOMPLETE]<br>
+?        - to print help [INCOMPLETE]<br>
 show     - to show a block of bytes of an opened file in HEX format [COMPLETE]<br>
 del      - to delete a block of bytes from the file [COMPLETE]<br>
 add      - to add bytes into the open file [COMPLETE]<br>
