@@ -13,19 +13,25 @@ void close_file(file_handler *fh)
 
 }
 
-void open_file(file_handler *fh, char *filename, char *patchfile_name)
+int open_file(file_handler *fh, char *filename, char *patchfile_name)
 {
 	const int base_filesize = 128;
 	const int filesize_increments = 64;
 
 	FILE *fp = fopen(patchfile_name, "a");
 	if (!fp)
+	{
 		printf("Error opening the patchfile [%s].\n", patchfile_name);
+		return -1;
+	}
 	fclose(fp);
 
 	fp = fopen(filename, "rb");
 	if (!fp)
+	{
 		printf("Error opening the file [%s]. Please make sure it exists.\n", filename);
+		return -1;
+	}
 	else
 	{
 		fh->file_data = (char *)malloc(base_filesize);
@@ -36,7 +42,7 @@ void open_file(file_handler *fh, char *filename, char *patchfile_name)
 			free(patchfile_name);
 			free(filename);
 			fclose(fp);
-			return;
+			return -1;
 		}
 
 		int max_size = base_filesize;
@@ -56,7 +62,7 @@ void open_file(file_handler *fh, char *filename, char *patchfile_name)
 					free(patchfile_name);
 					free(filename);
 					fclose(fp);
-					return;
+					return -1;
 				}
 				else
 					fh->file_data = b;
@@ -73,6 +79,7 @@ void open_file(file_handler *fh, char *filename, char *patchfile_name)
 			free(patchfile_name);
 			free(filename);
 			fclose(fp);
+			return -1;
 		}
 		else
 		{
@@ -81,38 +88,43 @@ void open_file(file_handler *fh, char *filename, char *patchfile_name)
 			fh->max_filesize = max_size;
 			fh->filesize = i;
 			fh->modified = 0;
+			return 0;
 		}
 	}
 }
 
-void save_file(file_handler *fh)
+int save_file(file_handler *fh)
 {
 	FILE *fp = fopen(fh->filename, "wb");
 
 	if (!fp)
+	{
 		printf("Error opening the file [%s]. Please make sure it exists.\n", fh->filename);
+		return -1;
+	}
 	else
 	{
 		if (fwrite(fh->file_data, 1, fh->filesize, fp) != fh->filesize)
 		{
 			printf("Error writing into the file. The file may be corrupted...\n");
 			fclose(fp);
-			return;
+			return -1;;
 		}
 
 		fclose(fp);
 		fh->modified = 0;
+		return 0;
 	}
 }
 
-void delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
+int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 {
 	// First, update the patch file:
 	FILE *fp = fopen(fh->patchfile_name, "a");
 	if (!fp)
 	{
 		printf("Error opening the patch file for updating. Command aborted\n");
-		return;
+		return -1;
 	}
 
 	fprintf(fp, "del %d %d ", start, end);
@@ -132,4 +144,5 @@ void delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 
 	fh->filesize -= 1 + end - start;
 	fh->modified = 1;
+	return 0;
 }
