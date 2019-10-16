@@ -28,6 +28,7 @@ more testing required still
 TODO:
 <br>
 <br>
+CRITICAL: fix problems concerning signed/unsigned chars when modifying or examining the file_data buffer
 ?    - refine the help info for each command<br>
 add<br>
 mod<br>
