@@ -34,7 +34,8 @@ apply<br>
 upload the design documents<br>
 refactoring and finetuning [MOSTLY DONE]<br>
 <br>
-Fixed problems:
+Fixed problems:<br>
+<br>
 CRITICAL: filesize (and max_filesize) was not handled correctly causing memory leaks, wrong allocations/deallocations,
 and data being pushed outside file_data buffer. [FIXED]<br>
 CRITICAL: fix problems concerning signed/unsigned chars when modifying or examining the file_data buffer. [FIXED]<br>
