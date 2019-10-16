@@ -28,10 +28,14 @@ more testing required still
 TODO:
 <br>
 <br>
-CRITICAL: fix problems concerning signed/unsigned chars when modifying or examining the file_data buffer
+CRITICAL: fix problems concerning signed/unsigned chars when modifying or examining the file_data buffer<br>
+CRITICAL: filesize (and max_filesize) not handled correctly causing memory leaks, wrong allocations/deallocations,
+and data being pushed outside file_data buffer.<br>
 ?    - refine the help info for each command<br>
 add<br>
 mod<br>
 apply<br>
 upload the design documents<br>
 refactoring and finetuning
+
+Fixed problems:
