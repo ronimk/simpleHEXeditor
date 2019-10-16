@@ -11,8 +11,8 @@ typedef struct file_handler {
 } file_handler;
 
 void close_file(file_handler *fh);
-void open_file(file_handler *fh, char *filename, char *changefile_name);
-void save_file(file_handler *fh);
-void delete_from_file(file_handler *fh, unsigned int start, unsigned int end);
+int open_file(file_handler *fh, char *filename, char *changefile_name);
+int save_file(file_handler *fh);
+int delete_from_file(file_handler *fh, unsigned int start, unsigned int end);
 
 #endif /* FILE_HANDLER_H_ */
