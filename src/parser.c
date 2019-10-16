@@ -4,7 +4,7 @@
 #include "hex_editor.h"
 #include "parser.h"
 
-static int terminal_char_p(char ch);
+static int hex_char_p(char ch);
 
 extern command commands[NUM_CMDS];
 
@@ -13,7 +13,7 @@ command *extract_command(const char *cmd_str)
     int i=0;
     char buf[MAX_CMD_NAME_LEN];
 
-    while (i < MAX_CMD_NAME_LEN-1 && !terminal_char_p(cmd_str[i]) && !isspace(cmd_str[i]))
+    while (i < MAX_CMD_NAME_LEN-1 && cmd_str[i]!='\0' && !isspace(cmd_str[i]))
     {
         buf[i] = cmd_str[i];
         i++;
@@ -32,7 +32,7 @@ command *extract_command(const char *cmd_str)
 
 const char *extract_arguments(const char *cmd_str)
 {
-    while (!isspace(*cmd_str) && !terminal_char_p(*cmd_str))
+    while (!isspace(*cmd_str) && *cmd_str!='\0')
         cmd_str++;
 
     if (isspace(*cmd_str))
@@ -45,7 +45,7 @@ char *get_first_argument(const char *arg_str)
 {
 	int len = 1;
 	const char *end_p = arg_str;
-	while (!isspace(*end_p) && !terminal_char_p(*end_p))
+	while (!isspace(*end_p) && *end_p != '\0')
 	{
         end_p++;
         len++;
@@ -69,14 +69,14 @@ int argument_arity(const char *arg_str)
 
     int i=0;
 
-    while (!terminal_char_p(arg_str[i]))
+    while (arg_str[i] != '\0')
     {
         if (isspace(arg_str[i]))
             while (isspace(arg_str[i++])) ;
 
         if (!isspace(arg_str[i]))
         {
-            while (!isspace(arg_str[i++]) && !terminal_char_p(arg_str[i])) ;
+            while (!isspace(arg_str[i++]) && arg_str[i]!='\0') ;
             arity++;
         }
     }
@@ -106,7 +106,7 @@ int parse_nonnegative_int(const char *str, unsigned int *res)
     if (!isdigit(str[0]))
         return -1;
 
-    int val=0;
+    unsigned int val=0;
     int i=0;
     while (isdigit(str[i]))
     {
@@ -115,7 +115,7 @@ int parse_nonnegative_int(const char *str, unsigned int *res)
         i++;
     }
 
-    if (isspace(str[i]) || terminal_char_p(str[i]))
+    if (isspace(str[i]) || str[i] == '\0')
     {
         *res = val;
         return 0;
@@ -131,9 +131,30 @@ int parse_nonnegative_int(const char *str, unsigned int *res)
  * This function should be used before read_next_byte, to check the integrity of
  * the given string.
 */
-int valid_hexadecimal_p(char *str)
+int valid_hexadecimal_p(const char *str)
 {
-    return 0;
+	char parity = 0;
+	int i=0;
+	while(str[i] != '\0')
+	{
+		if (!hex_char_p(toupper(str[i])))
+			return 0;
+
+		parity = ~parity;
+		i++;
+	}
+
+	if(parity == 0)
+		return 1;
+	else
+		return 0;
+}
+
+void next_hex_into_byte(const char *hex_str, unsigned char *res)
+{
+    *res = 0;
+	*res = isdigit(hex_str[0])? (hex_str[0] - '0')<<4: (toupper(hex_str[0]) - 'A' + 10)<<4;
+	*res += isdigit(hex_str[1])? (hex_str[1] - '0'): toupper(hex_str[1]) - 'A' + 10;
 }
 
 char printable_byte(char byte)
@@ -141,7 +162,8 @@ char printable_byte(char byte)
 	return isprint(byte)? byte: '.';
 }
 
-static int terminal_char_p(char ch)
+static int hex_char_p(char ch)
 {
-    return (ch == '\n' || ch == '\0');
+	return isdigit(ch) ||
+		   (ch >= 'A' && ch <= 'F');
 }

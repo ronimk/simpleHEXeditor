@@ -4,7 +4,7 @@
 typedef struct file_handler {
     char *filename;
     char *patchfile_name;
-    char *file_data;
+    unsigned char *file_data;
     int modified;
     unsigned int filesize;
     unsigned int max_filesize;
@@ -14,5 +14,6 @@ void close_file(file_handler *fh);
 int open_file(file_handler *fh, char *filename, char *changefile_name);
 int save_file(file_handler *fh);
 int delete_from_file(file_handler *fh, unsigned int start, unsigned int end);
+int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf);
 
 #endif /* FILE_HANDLER_H_ */

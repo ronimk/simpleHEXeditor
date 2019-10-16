@@ -19,7 +19,7 @@ static void eval_load(const char *arg_str, file_handler *fh);
 static void eval_apply(const char *arg_str, file_handler *fh);
 static void eval_quit(const char *arg_str, file_handler *fh);
 
-static void print_hextable(file_handler *fh, int start, int end);
+static void print_hextable(file_handler *fh, unsigned int start, unsigned int end);
 
 extern int quit_flag;
 
@@ -113,14 +113,14 @@ static void eval_show(const char *arg_str, file_handler *fh)
 
      unsigned int start, end;
 
-     if (parse_nonnegative_int(arg_str, &start) || start > fh->filesize)
+     if (parse_nonnegative_int(arg_str, &start) || start >= fh->filesize)
      {
     	 printf("Invalid [start] value given.\n");
     	 printf("For help, type \"? show\"\n");
     	 return;
      }
 
-     if (parse_nonnegative_int(extract_arguments(arg_str), &end) || end > fh->filesize)
+     if (parse_nonnegative_int(extract_arguments(arg_str), &end) || end >= fh->filesize)
      {
          printf("Invalid [end] value given.\n");
          printf("For help, type \"? show\"\n");
@@ -142,7 +142,7 @@ static void eval_del(const char *arg_str, file_handler *fh)
 	if (argument_arity(arg_str) != 2)
 	{
 	    printf("ERROR: del takes exactly two argument(s).\n");
-	    printf("For help, type \"? eval\"\n");
+	    printf("For help, type \"? del\"\n");
 	    return;
 	}
 
@@ -154,14 +154,14 @@ static void eval_del(const char *arg_str, file_handler *fh)
 
     unsigned int start, end;
 
-    if (parse_nonnegative_int(arg_str, &start) || start > fh->filesize)
+    if (parse_nonnegative_int(arg_str, &start) || start >= fh->filesize)
     {
    	 printf("Invalid [start] value given.\n");
    	 printf("For help, type \"? del\"\n");
    	 return;
     }
 
-    if (parse_nonnegative_int(extract_arguments(arg_str), &end) || end > fh->filesize)
+    if (parse_nonnegative_int(extract_arguments(arg_str), &end) || end >= fh->filesize)
     {
         printf("Invalid [end] value given.\n");
         printf("For help, type \"? del\"\n");
@@ -181,15 +181,47 @@ static void eval_del(const char *arg_str, file_handler *fh)
 
 static void eval_add(const char *arg_str, file_handler *fh)
 {
-    printf("add not implemented yet.\n");
+	if (argument_arity(arg_str) != 2)
+	{
+		printf("ERROR: add takes exactly two argument(s).\n");
+	    printf("For help, type \"? add\"\n");
+	    return;
+	}
+
+	if (!fh->file_data)
+	{
+		printf("ERROR: no currently open file exists.\n");
+		return;
+	}
+
+	unsigned int start;
+	if (parse_nonnegative_int(arg_str, &start) || start >= fh->filesize)
+	{
+	 	 printf("Invalid [start] value given.\n");
+	   	 printf("For help, type \"? add\"\n");
+	   	 return;
+	}
+
+	const char *hex = extract_arguments(arg_str);
+	if (!valid_hexadecimal_p(hex))
+	{
+		printf("Invalid [hex+] block given.\n");
+	    printf("For help, type \"? add\"\n");
+	}
+	else
+	{
+		if(!add_to_file(fh, start, hex))
+			printf("Adding to file finished...\n");
+	}
+
 }
 
 static void eval_mod(const char *arg_str, file_handler *fh)
 {
 	if (argument_arity(arg_str) != 2)
 	{
-	    printf("ERROR: del takes exactly two argument(s).\n");
-	    printf("For help, type \"? eval\"\n");
+	    printf("ERROR: mod takes exactly two argument(s).\n");
+	    printf("For help, type \"? mod\"n");
 	    return;
 	}
     printf("mod not implemented yet.\n");
@@ -205,11 +237,11 @@ static void eval_filesize(const char *arg_str, file_handler *fh)
     {
         if (!fh->file_data)
         {
-            printf("ERROR: no currently opened file exists. For more information, type \"? filesize\"\n");
+            printf("ERROR: no currently opened file exists.\n");
         }
         else
         {
-            printf("Current size of the file: %u\n", fh->filesize);
+            printf("Current size of the file: %u bytes\n", fh->filesize);
             printf("The file has %sbeen modified since last save.\n", fh->modified? "" : "not ");
 
         }
@@ -245,14 +277,13 @@ static void eval_load(const char *arg_str, file_handler *fh)
 	if (argument_arity(arg_str) != 2)
 	{
 	    printf("ERROR: ld takes exactly two arguments: the names of the file and the patchfile.\n");
-	    printf("For more information, type \"? load\"\n");
+	    printf("For more information, type \"? ld\"\n");
 	    return;
 	}
 
 	if (fh->file_data)
     {
-		// TODO: implement the following functionality:
-	    printf("Another file is currently opened. Do you wish to save the old file? (y/n)");
+		printf("Another file is currently opened. Do you wish to save the old file? (y/n)");
 	    if (prompt_yes_no())
 	    	save_file(fh);
 	    else
@@ -308,7 +339,6 @@ static void eval_quit(const char *arg_str, file_handler *fh)
         {
         	if (fh->modified)
         	{
-        		// TODO: implement the following functionality:
         		printf("Do you wish to save the modified file? (y/n)");
         	    if (prompt_yes_no())
         	    	save_file(fh);
@@ -323,7 +353,7 @@ static void eval_quit(const char *arg_str, file_handler *fh)
     }
 }
 
-static void print_hextable(file_handler *fh, int start, int end)
+static void print_hextable(file_handler *fh, unsigned int start, unsigned int end)
 {
 	#define BYTES_IN_LINE 16
 
@@ -350,10 +380,15 @@ static void print_hextable(file_handler *fh, int start, int end)
 		for (; j<BYTES_IN_LINE && pos <= end; j++, pos++)
 			printf("%02X ", fh->file_data[pos]);
 
-		if (pos > end)
+        // 2.a) For the last line, fill in the necessary empty spaces
+        //      between the hex and text representations:
+		if (i == lines-1)
 			printf("%*c", (BYTES_IN_LINE-j)*3, ' ');
+
 		printf("\t");
 
+		// 2.b) Print the text representation for the line
+		//      on the right of the hex representation:
 		for (int j=0; j<BYTES_IN_LINE && line_start<pos; j++, line_start++)
 			printf("%c", printable_byte(fh->file_data[line_start]));
 
