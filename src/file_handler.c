@@ -160,8 +160,6 @@ int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 {
     unsigned int hex_len = strlen(hex_buf);
-    printf("DEBUG: enter file_handler\n");
-    printf("DEBUG: start: %u, hex_buf: %s, hex_len: %u\n", start, hex_buf, hex_len);
 
 	// First, update the patch file, if necessary:
 	if (fh->record_patch)
@@ -186,7 +184,7 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 	// next, add the bytes to the file_handler:
 	// 1) if there is not enough room, extend the file_data buffer:
 	hex_len /= 2;
-    printf("DEBUG: start: %u, hex_buf: %s, hex_len: %u\n", start, hex_buf, hex_len);
+
 	if (fh->max_filesize < fh->filesize+hex_len)
 	{
 		unsigned char *b = (unsigned char *)realloc(fh->file_data, fh->filesize+hex_len);
@@ -201,21 +199,14 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 		fh->max_filesize = fh->filesize + hex_len;
 	}
 
-	printf("DEBUG: fh->filesize: %u\n", fh->filesize);
-
 	// 2) shift all the bytes past the starting point by hex_len to the "right", if necessary:
 	if (start < fh->filesize)
     {
         for (unsigned int i=fh->filesize-1; i!=start; i--)
             fh->file_data[i+hex_len] = fh->file_data[i];
-
-        printf("DEBUG: byte %u before move: %u", start, fh->file_data[start]);
-        printf("DEBUG: byte %u before move: %u", start+hex_len, fh->file_data[start+hex_len]);
         // Working with unsigned numbers, we need to manually shift the starting byte also, because
         // in the case that (start == 0), comparison (i>=start) fails:
-        fh->file_data[start] = fh->file_data[start+hex_len];
-        printf("DEBUG: byte %u after move: %u", start, fh->file_data[start]);
-            printf("DEBUG: byte %u after move: %u", start+hex_len, fh->file_data[start+hex_len]);
+        fh->file_data[start+hex_len] = fh->file_data[start];
 
     }
 
@@ -223,7 +214,6 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 	for (unsigned int i=start, j=0; i<start+hex_len; i++, j+=2)
         next_hex_into_byte(hex_buf+j, &fh->file_data[i]);
 
-    printf("\nDEBUG: byte %u after move: %u", start+hex_len, fh->file_data[start+hex_len]);
 	fh->filesize += hex_len;
 	fh->modified = 1;
 	return 0;
