@@ -52,6 +52,8 @@ Using unsigned int instead of int as the basic datatype would, in theory, double
 <br>
 Though, it is not difficult at all to change the system to have a more advanced data structure for handling the file_data, should one choose to, and hopefully that will be included in a future revision. However, a more advance ds for file_data handling would mean more space required for each byte in the opened file and less space available for the LPCXpresso chip!<br>
 <br>
+In hindsight, choosing to work with unsigned ints was a stupid decision, but it seemed "clever" enough when the project started...
+
 Future revisions:<br>
 <br>
 Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).
