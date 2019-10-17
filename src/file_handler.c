@@ -91,6 +91,7 @@ int open_file(file_handler *fh, char *filename, char *patchfile_name)
 			fh->max_filesize = max_size;
 			fh->filesize = i+1;
 			fh->modified = 0;
+			fh->record_patch = 1;
 			return 0;
 		}
 	}
@@ -122,22 +123,25 @@ int save_file(file_handler *fh)
 
 int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 {
-	// First, update the patch file:
-	FILE *fp = fopen(fh->patchfile_name, "a");
-	if (!fp)
-	{
-		printf("Error opening the patch file for updating. Command aborted\n");
-		return -1;
-	}
+	// First, update the patch file, if necessary:
+	if (fh->record_patch)
+    {
+        FILE *fp = fopen(fh->patchfile_name, "a");
+        if (!fp)
+        {
+            printf("Error opening the patch file for updating. Command aborted\n");
+            return -1;
+        }
 
-	fprintf(fp, "del %u %u ", start, end);
+        fprintf(fp, "del %u %u ", start, end);
 
-	for (unsigned int i=start; i<=end; i++)
-		fprintf(fp, "%02X", toupper(fh->file_data[i]));
+        for (unsigned int i=start; i<=end; i++)
+            fprintf(fp, "%02X", fh->file_data[i]);
 
-	fprintf(fp, "\n");
+        fprintf(fp, "\n");
 
-	fclose(fp);
+        fclose(fp);
+    }
 
 	// next, delete the bytes from the file_handler:
 	for (unsigned int i=start, j=end+1; j < fh->filesize; i++, j++)
@@ -150,24 +154,29 @@ int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 
 int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 {
-	// First, update the patch file:
-	FILE *fp = fopen(fh->patchfile_name, "a");
-	if (!fp)
-	{
-		printf("Error opening the patch file for updating. Command aborted\n");
-		return -1;
-	}
+    unsigned int hex_len;
 
-	unsigned int hex_len = strlen(hex_buf);
+	// First, update the patch file, if necessary:
+	if (fh->record_patch)
+    {
+        FILE *fp = fopen(fh->patchfile_name, "a");
+        if (!fp)
+        {
+            printf("Error opening the patch file for updating. Command aborted\n");
+            return -1;
+        }
 
-	fprintf(fp, "add %u ", start);
+        hex_len = strlen(hex_buf);
 
-	for (unsigned int i=0; i<hex_len; i++)
-		fprintf(fp, "%c", toupper(hex_buf[i]));
+        fprintf(fp, "add %u ", start);
 
-	fprintf(fp, "\n");
+        for (unsigned int i=0; i<hex_len; i++)
+            fprintf(fp, "%c", toupper(hex_buf[i]));
 
-	fclose(fp);
+        fprintf(fp, "\n");
+
+        fclose(fp);
+    }
 
 	// next, add the bytes to the file_handler:
 	// 1) if there is not enough room, extend the file_data buffer:

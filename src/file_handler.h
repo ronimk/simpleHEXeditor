@@ -6,6 +6,7 @@ typedef struct file_handler {
     char *patchfile_name;
     unsigned char *file_data;
     int modified;
+    int record_patch;
     unsigned int filesize;
     unsigned int max_filesize;
 } file_handler;

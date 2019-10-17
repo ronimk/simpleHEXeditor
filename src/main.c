@@ -19,7 +19,7 @@ int main(void) {
     commands[0].description(brief);
 
     char *input;
-    file_handler fh = {NULL, NULL, NULL, 0, 0, 0};
+    file_handler fh = {NULL, NULL, NULL, 0, 1, 0, 0};
 
     // The "REPL":
     while (!quit_flag)

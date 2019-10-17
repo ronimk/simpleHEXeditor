@@ -164,6 +164,5 @@ char printable_byte(char byte)
 
 static int hex_char_p(char ch)
 {
-	return isdigit(ch) ||
-		   (ch >= 'A' && ch <= 'F');
+	return (isdigit(ch) || (ch >= 'A' && ch <= 'F'));
 }

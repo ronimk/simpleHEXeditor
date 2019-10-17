@@ -218,13 +218,57 @@ static void eval_add(const char *arg_str, file_handler *fh)
 
 static void eval_mod(const char *arg_str, file_handler *fh)
 {
-	if (argument_arity(arg_str) != 2)
+	if (argument_arity(arg_str) != 3)
 	{
-	    printf("ERROR: mod takes exactly two argument(s).\n");
+	    printf("ERROR: mod takes exactly three argument(s).\n");
 	    printf("For help, type \"? mod\"n");
 	    return;
 	}
-    printf("mod not implemented yet.\n");
+    if (!fh->file_data)
+	{
+		printf("ERROR: no currently open file exists.\n");
+		return;
+	}
+
+    unsigned int start, end;
+    const char *next_arg = arg_str;
+    if (parse_nonnegative_int(next_arg, &start) || start >= fh->filesize)
+    {
+   	 printf("Invalid [start] value given.\n");
+   	 printf("For help, type \"? mod\"\n");
+   	 return;
+    }
+    next_arg = extract_arguments(next_arg);
+    if (parse_nonnegative_int(next_arg, &end) || end >= fh->filesize)
+    {
+        printf("Invalid [end] value given.\n");
+        printf("For help, type \"? mod\"\n");
+        return;
+    }
+
+    if (start > end)
+    {
+   	printf("[start] must be smaller than [end].\n");
+   	printf("For help, type \"? mod\"\n");
+   	return;
+    }
+
+    next_arg = extract_arguments(next_arg);
+	if (!valid_hexadecimal_p(next_arg))
+	{
+		printf("Invalid [hex+] block given.\n");
+	    printf("For help, type \"? mod\"\n");
+	}
+	else
+    {
+        if(delete_from_file(fh, start, end) || add_to_file(fh, start, next_arg))
+        {
+            printf("Error modifying the file. Data may be corrupted.\nSaving the file not advised.\n");
+            return;
+        }
+
+        printf("Finished modifying the file...\n");
+    }
 }
 
 static void eval_filesize(const char *arg_str, file_handler *fh)
