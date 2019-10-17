@@ -203,17 +203,27 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 
 	printf("DEBUG: fh->filesize: %u\n", fh->filesize);
 
-	// 2) shift all the bytes past the starting point by hex_len to the "right":
-	for (unsigned int i=fh->filesize-1; i != start; i--)
-        fh->file_data[i+hex_len] = fh->file_data[i];
-    // Working with unsigned numbers, we need to manually shift the starting byte also, because
-    // in the case that (start == 0), comparison i <= start fails!
-    fh->file_data[start] = fh->file_data[start+hex_len];
+	// 2) shift all the bytes past the starting point by hex_len to the "right", if necessary:
+	if (start < fh->filesize)
+    {
+        for (unsigned int i=fh->filesize-1; i!=start; i--)
+            fh->file_data[i+hex_len] = fh->file_data[i];
+
+        printf("DEBUG: byte %u before move: %u", start, fh->file_data[start]);
+        printf("DEBUG: byte %u before move: %u", start+hex_len, fh->file_data[start+hex_len]);
+        // Working with unsigned numbers, we need to manually shift the starting byte also, because
+        // in the case that (start == 0), comparison (i>=start) fails:
+        fh->file_data[start] = fh->file_data[start+hex_len];
+        printf("DEBUG: byte %u after move: %u", start, fh->file_data[start]);
+            printf("DEBUG: byte %u after move: %u", start+hex_len, fh->file_data[start+hex_len]);
+
+    }
 
 	// 3) add the new data into file_data buffer:
 	for (unsigned int i=start, j=0; i<start+hex_len; i++, j+=2)
         next_hex_into_byte(hex_buf+j, &fh->file_data[i]);
 
+    printf("\nDEBUG: byte %u after move: %u", start+hex_len, fh->file_data[start+hex_len]);
 	fh->filesize += hex_len;
 	fh->modified = 1;
 	return 0;

@@ -206,7 +206,7 @@ static void eval_add(const char *arg_str, file_handler *fh)
 	}
 
 	unsigned int start;
-	if (parse_nonnegative_int(arg_str, &start) || start >= fh->filesize)
+	if (parse_nonnegative_int(arg_str, &start) || start > fh->filesize)
 	{
 	 	 printf("Invalid [start] value given.\n");
 	   	 printf("For help, type \"? add\"\n");
