@@ -16,5 +16,6 @@ typedef struct command {
 } command;
 
 void init_commands(void);
+void eval(const char *input, file_handler *fh);
 
 #endif /* HEX_EDITOR_H_ */

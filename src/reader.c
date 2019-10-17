@@ -9,7 +9,7 @@
  *  The calling program should take care of freeing any unneeded string buffers
  *  created by readline.
 */
-char *readline(void)
+char *readline(FILE *stream)
 {
     const int realloc_size = 32;
     int line_len = 32;
@@ -21,28 +21,30 @@ char *readline(void)
         fprintf(stderr, "Memory allocation error");
         exit(-1);
     }
-    input[0] = '\0';
 
     char *endp;
 
-    fgets(input, line_len, stdin);
+    if (fgets(input, line_len, stream) == NULL)
+    {
+        free(input);
+        return NULL;
+    }
 
-    if (input[0])
-        while (input[strlen(input)-1] != '\n')
+    while (input[strlen(input)-1] != '\n')
+    {
+        line_len += realloc_size;
+        char *b = (char *)realloc(input, line_len);
+        if (!b)
         {
-            line_len += realloc_size;
-            char *b = (char *)realloc(input, line_len);
-            if (!b)
-            {
-                fprintf(stderr, "Memory allocation error");
-                free(input);
-                exit(-1);
-            }
-            input = b;
-
-            endp = input + strlen(input);
-            fgets(endp, realloc_size, stdin);
+            fprintf(stderr, "Memory allocation error");
+            free(input);
+            exit(-1);
         }
+        input = b;
+
+        endp = input + strlen(input);
+        fgets(endp, realloc_size, stream);
+    }
 
     strtok(input, "\n");
     return input;

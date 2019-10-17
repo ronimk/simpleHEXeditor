@@ -115,12 +115,16 @@ void print_load_info(descr_mode m)
 
 void print_apply_info(descr_mode m)
 {
-    printf("apply [patch]: applies a change-patch to the current file.\n");
+    printf("apply [patch] (optional: reverse): applies a change-patch to the current file.\n");
     if (m == detailed)
     {
         printf("\n");
         printf("[patch]: the name of the patch file.\n");
-        printf("The file must not contain inconsistent data relative to the patch.\n");
+        printf("If \"reverse\" is given as a second argument to apply, the patch is applied so that the file\n");
+        printf("will be reverted back to an earlier state, before all the patch modifications to the file.\n");
+        printf("Otherwise the commands in the patch are applied directly.\n");
+        printf("\n");
+        printf("The file must not contain inconsistent data relative to the patch or the file will become corrupted.\n");
         printf("\n");
         printf("NOTE: There must exist a currently opened file, or the command produces and error.\n");
     }

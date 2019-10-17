@@ -84,6 +84,17 @@ int argument_arity(const char *arg_str)
     return arity;
 }
 
+void remove_last_arg(char *arg_str)
+{
+    int len = strlen(arg_str);
+    int i = len-1;
+
+    while (i>0 && arg_str[i] != ' ')
+        i--;
+
+    arg_str[i] = '\0';
+}
+
 /*
  * read_nonnegative_int works similarly to the library function atoi
  * with the following exceptions:
@@ -153,8 +164,18 @@ int valid_hexadecimal_p(const char *str)
 void next_hex_into_byte(const char *hex_str, unsigned char *res)
 {
     *res = 0;
-	*res = isdigit(hex_str[0])? (hex_str[0] - '0')<<4: (toupper(hex_str[0]) - 'A' + 10)<<4;
+	*res = isdigit(hex_str[0])? (hex_str[0] - '0'): (toupper(hex_str[0]) - 'A' + 10);
+	*res <<=4;
 	*res += isdigit(hex_str[1])? (hex_str[1] - '0'): toupper(hex_str[1]) - 'A' + 10;
+}
+
+void byte_to_hex(char byte, char hex[3])
+{
+    static char hex_table[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    int h = (byte & 0xF0)>>4;
+    hex[0] = hex_table[h];
+    h = byte & 0x0F;
+    hex[1] = hex_table[h];
 }
 
 char printable_byte(char byte)

@@ -25,22 +25,10 @@ int main(void) {
     while (!quit_flag)
     {
         printf("\n>> ");
-        input = readline();
+        input = readline(stdin);
         eval(input, &fh);
         free(input);
     }
 
     return 0;
-}
-
-void eval(const char *input, file_handler *fh)
-{
-    command *cmd = extract_command(input);
-
-    if (!cmd)
-        printf("ERROR: unknown command.\n");
-    else
-    {
-        cmd->eval_f(extract_arguments(input), fh);
-    }
 }

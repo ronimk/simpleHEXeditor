@@ -48,8 +48,8 @@ int open_file(file_handler *fh, char *filename, char *patchfile_name)
 			return -1;
 		}
 
-		int max_size = base_filesize;
-		int i=0;
+		unsigned int max_size = base_filesize;
+		unsigned int i=0;
 		unsigned char ch;
 		while (fread(&ch, 1, 1, fp))
 		{
@@ -136,7 +136,12 @@ int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
         fprintf(fp, "del %u %u ", start, end);
 
         for (unsigned int i=start; i<=end; i++)
-            fprintf(fp, "%02X", fh->file_data[i]);
+        {
+            char next_hex[3];
+            next_hex[2] = '0';
+            byte_to_hex(fh->file_data[i], next_hex);
+            fprintf(fp, "%s", next_hex);
+        }
 
         fprintf(fp, "\n");
 
@@ -154,7 +159,9 @@ int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
 
 int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 {
-    unsigned int hex_len;
+    unsigned int hex_len = strlen(hex_buf);
+    printf("DEBUG: enter file_handler\n");
+    printf("DEBUG: start: %u, hex_buf: %s, hex_len: %u\n", start, hex_buf, hex_len);
 
 	// First, update the patch file, if necessary:
 	if (fh->record_patch)
@@ -165,8 +172,6 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
             printf("Error opening the patch file for updating. Command aborted\n");
             return -1;
         }
-
-        hex_len = strlen(hex_buf);
 
         fprintf(fp, "add %u ", start);
 
@@ -181,7 +186,7 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 	// next, add the bytes to the file_handler:
 	// 1) if there is not enough room, extend the file_data buffer:
 	hex_len /= 2;
-
+    printf("DEBUG: start: %u, hex_buf: %s, hex_len: %u\n", start, hex_buf, hex_len);
 	if (fh->max_filesize < fh->filesize+hex_len)
 	{
 		unsigned char *b = (unsigned char *)realloc(fh->file_data, fh->filesize+hex_len);
@@ -196,13 +201,18 @@ int add_to_file(file_handler *fh, unsigned int start, const char *hex_buf)
 		fh->max_filesize = fh->filesize + hex_len;
 	}
 
+	printf("DEBUG: fh->filesize: %u\n", fh->filesize);
+
 	// 2) shift all the bytes past the starting point by hex_len to the "right":
-	for (unsigned int i=fh->filesize-1; i>=start; i--)
-		fh->file_data[i+hex_len] = fh->file_data[i];
+	for (unsigned int i=fh->filesize-1; i != start; i--)
+        fh->file_data[i+hex_len] = fh->file_data[i];
+    // Working with unsigned numbers, we need to manually shift the starting byte also, because
+    // in the case that (start == 0), comparison i <= start fails!
+    fh->file_data[start] = fh->file_data[start+hex_len];
 
 	// 3) add the new data into file_data buffer:
 	for (unsigned int i=start, j=0; i<start+hex_len; i++, j+=2)
-		next_hex_into_byte(hex_buf+j, &fh->file_data[i]);
+        next_hex_into_byte(hex_buf+j, &fh->file_data[i]);
 
 	fh->filesize += hex_len;
 	fh->modified = 1;

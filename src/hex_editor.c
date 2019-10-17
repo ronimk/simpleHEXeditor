@@ -66,6 +66,17 @@ void init_commands(void)
     commands[9].description = print_quit_info;
 }
 
+void eval(const char *input, file_handler *fh)
+{
+    command *cmd = extract_command(input);
+
+    if (!cmd)
+        printf("ERROR: unknown command.\n");
+    else
+    {
+        cmd->eval_f(extract_arguments(input), fh);
+    }
+}
 
 static void eval_more(const char *arg_str, file_handler *fh)
 {
@@ -325,9 +336,9 @@ static void eval_load(const char *arg_str, file_handler *fh)
 	    return;
 	}
 
-	if (fh->file_data)
+	if (fh->file_data && fh->modified)
     {
-		printf("Another file is currently opened. Do you wish to save the old file? (y/n)");
+		printf("A modified file is currently opened. Do you wish to save the old file? (y/n)");
 	    if (prompt_yes_no())
 	    	save_file(fh);
 	    else
@@ -368,7 +379,70 @@ static void eval_load(const char *arg_str, file_handler *fh)
 
 static void eval_apply(const char *arg_str, file_handler *fh)
 {
-    printf("apply not implemented yet.\n");
+    int arity = argument_arity(arg_str);
+    if (arity < 1 || arity > 2)
+    {
+        printf("ERROR: apply takes one mandatory argument and one optional argument.\n");
+        printf("For more information, type \"? apply\"\n");
+        return;
+    }
+
+    if (!fh->file_data)
+	{
+		printf("ERROR: no currently open file exists.\n");
+		return;
+	}
+
+	const char *next_arg = arg_str;
+	char *applypatch_filename = get_first_argument(next_arg);
+
+	if (!applypatch_filename)
+	{
+		printf("Memory allocation error.\n");
+		return;
+	}
+
+	fh->record_patch = 0;
+
+	if (arity == 1)
+    {
+        FILE *fp = fopen(applypatch_filename, "r");
+        if (!fp)
+        {
+            printf("Error opening the patch file\n");
+            free(applypatch_filename);
+            return;
+        }
+
+        char *next_line;
+        while ((next_line = readline(fp)))
+        {
+            printf("~%s~ : ", next_line);
+            if (!strcmp("del", extract_command(next_line)->name))
+            {
+                // Due to the initial decisions to both make sure the argument arity
+                // is not violated for any command, and to allow for applying patches
+                // in "both directions", we need to make ugly looking
+                // extra work here. In a future version, the easiest solution to avoid
+                // this extra work would be to make the argument_arity checking a little
+                // less strict...
+                remove_last_arg(next_line);
+            }
+            printf("~%s~\n", next_line);
+            eval(next_line, fh);
+            free(next_line);
+        }
+
+        if (ferror(fp))
+            printf("Error applying the patch file. The open file may be corrupted.\nSaving not recommended.\n");
+    }
+    else
+    {
+        // handle reverse case here
+         printf("apply not fully implemented yet.\n");
+    }
+
+	fh->record_patch = 1;
 }
 
 static void eval_quit(const char *arg_str, file_handler *fh)
