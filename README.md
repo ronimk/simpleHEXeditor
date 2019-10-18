@@ -54,8 +54,8 @@ Though, it is not difficult at all to change the system to have a more advanced 
 <br>
 In hindsight, choosing to work with unsigned ints was a stupid decision, but it seemed "clever" enough when the project started.<br>
 <br>
-In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...
-
+In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...<br>
+<br>
 Future revisions:<br>
 <br>
 Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).
