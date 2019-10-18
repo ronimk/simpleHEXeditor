@@ -26,7 +26,6 @@ Mostly tested. A bit more testing required still
 <br>
 TODO:
 <br>
-<br>
 ?    - refine the help info for each command. <br>
 apply<br>
 upload the design documents<br>
@@ -55,5 +54,5 @@ In hindsight, choosing to work with unsigned ints was a stupid decision, but it 
 In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...<br>
 <br>
 Future revisions:<br>
-Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).
-Make the file handling more flexible for very big files. 
+* Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).<br>
+* Make the file handling more flexible for very big files. 
