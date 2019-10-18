@@ -114,6 +114,10 @@ void remove_last_arg(char *arg_str)
  */
 int parse_nonnegative_int(const char *str, unsigned int *res)
 {
+    // Note that nothing currently prevents
+	// the user from "overflowing" the number by simply
+	// typing enough digits...
+	// A better digit reader should be used for a real application
     if (!isdigit(str[0]))
         return -1;
 
@@ -164,7 +168,7 @@ int valid_hexadecimal_p(const char *str)
 void next_hex_into_byte(const char *hex_str, unsigned char *res)
 {
     *res = 0;
-	*res = isdigit(hex_str[0])? (hex_str[0] - '0'): (toupper(hex_str[0]) - 'A' + 10);
+	*res = isdigit(hex_str[0])? (hex_str[0] - '0'): toupper(hex_str[0]) - 'A' + 10;
 	*res <<=4;
 	*res += isdigit(hex_str[1])? (hex_str[1] - '0'): toupper(hex_str[1]) - 'A' + 10;
 }

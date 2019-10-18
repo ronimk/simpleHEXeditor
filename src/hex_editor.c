@@ -324,7 +324,7 @@ static void eval_save(const char *arg_str, file_handler *fh)
 			printf("Saving complete...\n");
 	}
 	else
-		printf("No modifications to the file.\n");
+		printf("No modifications done to the file.\n");
 }
 
 static void eval_load(const char *arg_str, file_handler *fh)

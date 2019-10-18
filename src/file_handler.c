@@ -51,7 +51,7 @@ int open_file(file_handler *fh, char *filename, char *patchfile_name)
 		unsigned int max_size = base_filesize;
 		unsigned int i=0;
 		unsigned char ch;
-		while (fread(&ch, 1, 1, fp))
+		while (fread(&ch, sizeof(unsigned char), 1, fp))
 		{
 			if (i >= max_size-1)
 			{
@@ -108,7 +108,7 @@ int save_file(file_handler *fh)
 	}
 	else
 	{
-		if (fwrite(fh->file_data, 1, fh->filesize, fp) != fh->filesize)
+		if (fwrite(fh->file_data, sizeof(unsigned char), fh->filesize, fp) != fh->filesize)
 		{
 			printf("Error writing into the file. The file may be corrupted...\n");
 			fclose(fp);
@@ -138,7 +138,7 @@ int delete_from_file(file_handler *fh, unsigned int start, unsigned int end)
         for (unsigned int i=start; i<=end; i++)
         {
             char next_hex[3];
-            next_hex[2] = '0';
+            next_hex[2] = '\0';
             byte_to_hex(fh->file_data[i], next_hex);
             fprintf(fp, "%s", next_hex);
         }
