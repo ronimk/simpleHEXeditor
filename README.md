@@ -7,7 +7,6 @@ Tested with MCUXpresso and CodeBlocks
 <br>
 List of available commands:
 <br>
-<br>
 ?        - to print help [INCOMPLETE]<br>
 show     - to show a block of bytes of an opened file in HEX format [COMPLETE]<br>
 del      - to delete a block of bytes from the file [COMPLETE]<br>
@@ -34,7 +33,6 @@ upload the design documents<br>
 refactoring and finetuning [MOSTLY DONE]<br>
 <br>
 Fixed problems:<br>
-<br>
 CRITICAL: due to the program using unsigned ints, a loop in eval_add broke if given 0 as an argument. [FIXED]
 CRITICAL: filesize (and max_filesize) was not handled correctly causing memory leaks, wrong allocations/deallocations,
 and data being pushed outside file_data buffer. [FIXED]<br>
@@ -57,6 +55,5 @@ In hindsight, choosing to work with unsigned ints was a stupid decision, but it 
 In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...<br>
 <br>
 Future revisions:<br>
-<br>
 Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).
 Make the file handling more flexible for very big files. 
