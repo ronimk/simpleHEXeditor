@@ -5,6 +5,7 @@
 #include "parser.h"
 
 static int hex_char_p(char ch);
+static int hex_value(char hex_ch);
 
 extern command commands[NUM_CMDS];
 
@@ -118,22 +119,43 @@ int parse_nonnegative_int(const char *str, unsigned int *res)
 	// the user from "overflowing" the number by simply
 	// typing enough digits...
 	// A better digit reader should be used for a real application
-    if (!isdigit(str[0]))
-        return -1;
-
-    unsigned int val=0;
-    int i=0;
-    while (isdigit(str[i]))
+	unsigned int val=0;
+	// there are two cases to consider: either the number is a decimal number,
+	//  or it is a hexadecimal number, in which case it starts with a "0x" or "0X":
+    if (str[0] == '0' && toupper(str[1]) == 'X')
     {
-        val *= 10;
-        val += str[i] - '0';
-        i++;
+        int i=2;
+        char next_hex;
+        while (hex_char_p((next_hex = toupper(str[i]))))
+        {
+            val <<= 4;
+            val |= hex_value(next_hex);
+            i++;
+        }
+
+        if (i>2 && (isspace(next_hex) || next_hex == '\0'))
+        {
+            *res = val;
+            return 0;
+        }
+        else return -1;
     }
-
-    if (isspace(str[i]) || str[i] == '\0')
+    if (isdigit(str[0]))
     {
-        *res = val;
-        return 0;
+        int i=0;
+        while (isdigit(str[i]))
+        {
+            val *= 10;
+            val += str[i] - '0';
+            i++;
+        }
+
+        if (isspace(str[i]) || str[i] == '\0')
+        {
+            *res = val;
+            return 0;
+        }
+        else return -1;
     }
     else return -1;
 }
@@ -168,9 +190,9 @@ int valid_hexadecimal_p(const char *str)
 void next_hex_into_byte(const char *hex_str, unsigned char *res)
 {
     *res = 0;
-	*res = isdigit(hex_str[0])? (hex_str[0] - '0'): toupper(hex_str[0]) - 'A' + 10;
+	*res = hex_value(toupper(hex_str[0]));
 	*res <<=4;
-	*res += isdigit(hex_str[1])? (hex_str[1] - '0'): toupper(hex_str[1]) - 'A' + 10;
+	*res += hex_value(toupper(hex_str[1]));
 }
 
 void byte_to_hex(char byte, char hex[3])
@@ -190,4 +212,9 @@ char printable_byte(char byte)
 static int hex_char_p(char ch)
 {
 	return (isdigit(ch) || (ch >= 'A' && ch <= 'F'));
+}
+
+static int hex_value(char hex_ch)
+{
+    return isdigit(hex_ch)? (hex_ch - '0'): hex_ch - 'A' + 10;
 }
