@@ -21,6 +21,8 @@ static void eval_quit(const char *arg_str, file_handler *fh);
 
 static void print_hextable(file_handler *fh, unsigned int start, unsigned int end);
 
+static void reverse_command(char *cmd_line);
+
 extern int quit_flag;
 
 void init_commands(void)
@@ -417,7 +419,6 @@ static void eval_apply(const char *arg_str, file_handler *fh)
         char *next_line;
         while ((next_line = readline(fp)))
         {
-            printf("~%s~ : ", next_line);
             if (!strcmp("del", extract_command(next_line)->name))
             {
                 // Due to the initial decisions to both make sure the argument arity
@@ -428,20 +429,73 @@ static void eval_apply(const char *arg_str, file_handler *fh)
                 // less strict...
                 remove_last_arg(next_line);
             }
-            printf("~%s~\n", next_line);
             eval(next_line, fh);
             free(next_line);
         }
 
         if (ferror(fp))
             printf("Error applying the patch file. The open file may be corrupted.\nSaving not recommended.\n");
+
+        fclose(fp);
     }
     else
     {
-        // handle reverse case here
-         printf("apply not fully implemented yet.\n");
+        // The following algorithm is a bit ugly, but it does the trick
+        // of reading each line of the applypatch file from end to start
+        // and reversing each command to be applied:
+        FILE *fp = fopen(applypatch_filename, "rb");
+        if (!fp)
+        {
+            printf("Error opening the patch file\n");
+            free(applypatch_filename);
+            return;
+        }
+
+        // set everything up for line seeking:
+        int end = 0;
+        long i = 2;
+        fseek(fp, 0L, SEEK_END);
+        long apply_size = ftell(fp);
+        fseek(fp, -i, SEEK_END);
+        char ch = fgetc(fp);
+
+        while (!end)
+        {
+            // seek, read and reverse the next line:
+            while (i < apply_size && ch != '\n')
+            {
+                fseek(fp, -i, SEEK_END);
+                ch = fgetc(fp);
+                i++;
+            }
+
+            if (i == apply_size)
+            {
+                end = 1;
+                fseek(fp, 0, SEEK_SET);
+            }
+
+            char *next_line = readline(fp);
+            strtok(next_line, "\r\n");
+
+            reverse_command(next_line);
+
+            // evaluate the line and prepare for the move to the next line, if necessary:
+            eval(next_line, fh);
+            free(next_line);
+
+            if (!end)
+            {
+                i+=2;
+                fseek(fp, -i, SEEK_END);
+                ch = fgetc(fp);
+            }
+
+        }
+        fclose(fp);
     }
 
+    free(applypatch_filename);
 	fh->record_patch = 1;
 }
 
@@ -512,4 +566,46 @@ static void print_hextable(file_handler *fh, unsigned int start, unsigned int en
 
 		printf("\n");
 	}
+}
+
+static void reverse_command(char *cmd_line)
+{
+    if (cmd_line[0] == 'a')
+    {   // reverse "add" command:
+        cmd_line[0] = 'd';
+        cmd_line[1] = 'e';
+        cmd_line[2] = 'l';
+
+        const char *next_arg = extract_arguments(cmd_line);
+        unsigned int start;
+        parse_nonnegative_int(next_arg, &start);
+        next_arg = extract_arguments(next_arg);
+        unsigned int end = start + strlen(next_arg)/2 - 1;
+
+        // the next loop is needed because extract_argument promises to return a
+        // const char *, thus, last_arg should not be modified directly
+        while (cmd_line != next_arg)
+            cmd_line++;
+
+        itoa(end, cmd_line, 10);
+    }
+    else
+    {   // reverse "del" commmand:
+        cmd_line[0] = 'a';
+        cmd_line[1] = 'd';
+        cmd_line[2] = 'd';
+        const char *target_arg = extract_arguments(extract_arguments(cmd_line));
+
+        // the next loop is needed because extract_argument promises to return a
+        // const char *, thus, last_arg should not be modified directly
+        while (cmd_line != target_arg)
+            cmd_line++;
+
+        target_arg = extract_arguments(cmd_line);
+
+        while (*target_arg != '\0')
+            *cmd_line++ = *target_arg++;
+
+        *cmd_line = '\0';
+    }
 }
