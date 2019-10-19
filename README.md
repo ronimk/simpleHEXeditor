@@ -55,7 +55,10 @@ In hindsight, choosing to work with unsigned ints was a stupid decision, but it 
 In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...<br>
 <br>
 <br>
-Everything else turned out prretty neat, but eval_apply (and reverse_command) is currently a bit of a mess. It's been rigorously tested, but the code itself could be much cleaner.
+Applying a patch, not to speak of rverting back to an older version of an edited file (by reverse apply) is handled very slowly intentionally - as strange as that may sound. The LPCXpresso chip has so little heap space that I didn't want to waste any more of it than necessary. Thus a patchfile is being read and processed on the fly, without loading any more of it than a single line at a time into the program memory.<br>
+<br>
+<br>
+Last but not least: everything else turned out pretty neat, but eval_apply (and reverse_command) is currently a bit of a mess. It's been rigorously tested, so it should work, but the code itself could be much cleaner.
 Future revisions:<br>
 * Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).<br>
 * Make the file handling more flexible for very big files. 
