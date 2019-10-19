@@ -15,7 +15,7 @@ mod      - to modify a block of bytes in the file [COMPLETE]<br>
 filesize - to print the size of the open file [COMPLETE]<br>
 sav      - to save any changes made to the file [COMPLETE]<br>
 ld       - to open a desired file [COMPLETE]<br>
-apply    - to apply a previous patch to the file [INCOMPLETE]<br>
+apply    - to apply a previous patch to the file [COMPLETE]<br>
 quit     - quits the program [COMPLETE]
 <br>
 <br>
@@ -26,8 +26,9 @@ Mostly tested. A bit more testing required still
 <br>
 TODO:
 <br>
+clean up eval_apply and reverse_command<br>
+<br>
 ?    - refine the help info for each command. <br>
-apply<br>
 upload the design documents<br>
 refactoring and finetuning [MOSTLY DONE]<br>
 <br>
@@ -53,6 +54,8 @@ In hindsight, choosing to work with unsigned ints was a stupid decision, but it 
 <br>
 In any case, a MAX_FILESIZE-limit should be introduced and checked whenever needed in order to prevent the system breaking when the size of the file being modified approaches the maximum limits the system can handle. Otherwise a user might (intentionally or not) try to add, for example, past the maximum indexable array element...<br>
 <br>
+<br>
+Everything else turned out prretty neat, but eval_apply (and reverse_command) is currently a bit of a mess. It's been rigorously tested, but the code itself could be much cleaner.
 Future revisions:<br>
 * Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).<br>
 * Make the file handling more flexible for very big files. 
