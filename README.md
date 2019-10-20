@@ -1,5 +1,5 @@
 # simpleHEXeditor
-[A small project for the fall break 2019](view2.png)
+![A small project for the fall break 2019](view2.png)
 <br>
 <br>
 Tested with MCUXpresso and CodeBlocks
