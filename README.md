@@ -19,13 +19,6 @@ apply    - to apply a previous patch to the file<br>
 quit     - quits the program<br>
 <br>
 <br>
-Fixed problems:<br>
-CRITICAL: due to the program using unsigned ints, a loop in eval_add broke if given 0 as an argument. [FIXED]
-CRITICAL: filesize (and max_filesize) was not handled correctly causing memory leaks, wrong allocations/deallocations,
-and data being pushed outside file_data buffer. [FIXED]<br>
-CRITICAL: fix problems concerning signed/unsigned chars when modifying or examining the file_data buffer. [FIXED]<br>
-<br>
-<br>
 Known issues:<br>
 The maximum sie of a file is constrained by the size of unsigned int in the system.<br>
 <br>
