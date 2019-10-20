@@ -19,11 +19,6 @@ apply    - to apply a previous patch to the file<br>
 quit     - quits the program<br>
 <br>
 <br>
-TODO:
-<br>
-clean up eval_apply and reverse_command<br>
-upload the design documents<br>
-<br>
 Fixed problems:<br>
 CRITICAL: due to the program using unsigned ints, a loop in eval_add broke if given 0 as an argument. [FIXED]
 CRITICAL: filesize (and max_filesize) was not handled correctly causing memory leaks, wrong allocations/deallocations,
@@ -55,4 +50,5 @@ Last but not least: everything else turned out pretty neat, but eval_apply (and 
 <br>
 Future revisions:<br>
 * Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).<br>
-* Make the file handling more flexible (and safe) for very big files. 
+* Make the file handling more flexible (and safe) for very big files.
+* Refactor eval_apply and reverse_command
