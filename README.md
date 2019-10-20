@@ -7,30 +7,22 @@ Tested with MCUXpresso and CodeBlocks
 <br>
 List of available commands:
 <br>
-?        - to print help [INCOMPLETE]<br>
-show     - to show a block of bytes of an opened file in HEX format [COMPLETE]<br>
-del      - to delete a block of bytes from the file [COMPLETE]<br>
-add      - to add bytes into the open file [COMPLETE]<br>
-mod      - to modify a block of bytes in the file [COMPLETE]<br>
-filesize - to print the size of the open file [COMPLETE]<br>
-sav      - to save any changes made to the file [COMPLETE]<br>
-ld       - to open a desired file [COMPLETE]<br>
-apply    - to apply a previous patch to the file [COMPLETE]<br>
-quit     - quits the program [COMPLETE]
-<br>
-<br>
-Deadline 20.10.
-<br>
-Mostly tested. A bit more testing required still
+?        - to print help<br>
+show     - to show a block of bytes of an opened file in HEX format<br>
+del      - to delete a block of bytes from the file<br>
+add      - to add bytes into the open file<br>
+mod      - to modify a block of bytes in the file<br>
+filesize - to print the size of the open file<br>
+sav      - to save any changes made to the file<br>
+ld       - to open a desired file<br>
+apply    - to apply a previous patch to the file<br>
+quit     - quits the program<br>
 <br>
 <br>
 TODO:
 <br>
 clean up eval_apply and reverse_command<br>
-<br>
-?    - refine the help info for each command. <br>
 upload the design documents<br>
-refactoring and finetuning [MOSTLY DONE]<br>
 <br>
 Fixed problems:<br>
 CRITICAL: due to the program using unsigned ints, a loop in eval_add broke if given 0 as an argument. [FIXED]
@@ -63,4 +55,4 @@ Last but not least: everything else turned out pretty neat, but eval_apply (and 
 <br>
 Future revisions:<br>
 * Enable a mode where the user can choose if a file is to be logged for patching (easy to introduce now that the foundations for this are already coded in).<br>
-* Make the file handling more flexible for very big files. 
+* Make the file handling more flexible (and safe) for very big files. 
