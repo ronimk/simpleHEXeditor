@@ -46,7 +46,7 @@ char *readline(FILE *stream)
         fgets(endp, realloc_size, stream);
     }
 
-    strtok(input, "\n");
+    strtok(input, "\r\n");
     return input;
 }
 
