@@ -58,7 +58,7 @@ int prompt_yes_no(void)
 	while (1)
 	{
 	    fgets(input, ans_len, stdin);
-	    strtok(input, "\n");
+	    strtok(input, "\r\n");
 
 	    if (!(strcmp(input, "yes") && strcmp(input, "y")))
 		    return 1;
